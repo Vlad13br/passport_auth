@@ -32,16 +32,28 @@ function generateAccessToken(user) {
 
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
+
+  const users = readUsersFromFile();
+
+  // Перевірка, чи вже існує користувач із таким email
+  const existingUser = users.find((user) => user.email === email);
+  if (existingUser) {
+    return res.status(400).send("Email is already registered");
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
-  const users = readUsersFromFile(); // Читаємо користувачів з файлу
+
   const user = {
     id: Date.now().toString(),
     name,
     email,
     password: hashedPassword,
   };
+
   users.push(user);
+
   saveUsersToFile(users);
+
   res.status(201).send("User registered");
 };
 

@@ -22,5 +22,11 @@
     "name": "mia",
     "email": "user@gmail.com",
     "password": "$2b$10$JOlTNlas/fg2AexnrVPs9.ehjK2pswUdmSn9u7QOTsdJuSrstclc6"
+  },
+  {
+    "id": "1727700875156",
+    "name": "sam",
+    "email": "lox@gmail.com",
+    "password": "$2b$10$BpdC7Cwzmg3eqnEYA0zE0eOd2gvF3HmVViJnOnzj7jB5mz4CNYqLi"
   }
 ]
