@@ -28,5 +28,11 @@
     "name": "sam",
     "email": "lox@gmail.com",
     "password": "$2b$10$BpdC7Cwzmg3eqnEYA0zE0eOd2gvF3HmVViJnOnzj7jB5mz4CNYqLi"
+  },
+  {
+    "id": "1728114712269",
+    "name": "vlad",
+    "email": "vlad@gmail.com",
+    "password": "$2b$10$sBeq1fwpbwsN8.N.NkMIye0d9X9/CLsMPa3Ou8nKf3H65ZFfVbB3e"
   }
 ]
