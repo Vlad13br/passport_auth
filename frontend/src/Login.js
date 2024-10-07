@@ -1,9 +1,10 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import AuthContext from "./context/AuthProvider";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Login = () => {
-    const { setAuth } = useContext(AuthContext);
+    const { auth, setAuth } = useContext(AuthContext); // Виклик useContext у компоненті
     const emailRef = useRef();
     const errRef = useRef();
 
@@ -29,11 +30,11 @@ const Login = () => {
                 password,
             }, {
                 headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
+                withCredentials: true, // Для збереження refreshToken в cookie
             });
 
             console.log(JSON.stringify(response?.data));
-            const accessToken = response.data.accessToken; // Отримання токена з відповіді
+            const accessToken = response.data.accessToken;
             if (accessToken) {
                 setAuth({ email, accessToken });
                 setEmail('');
@@ -44,7 +45,7 @@ const Login = () => {
             }
 
         } catch (err) {
-            console.error("Error during login:", err); // Логування помилок
+            console.error("Error during login:", err);
             if (!err?.response) {
                 setErrMsg('No Server Response');
             } else if (err.response?.status === 400) {
@@ -58,15 +59,41 @@ const Login = () => {
         }
     }
 
+    const refreshAccessToken = async () => {
+        try {
+            const response = await axios.post('http://localhost:3001/auth/token', {}, { withCredentials: true });
+            console.log('Token refreshed:', response.data);
+
+            const newAccessToken = response.data.accessToken;
+            setAuth(prev => ({ ...prev, accessToken: newAccessToken })); // Оновлення токену
+            alert("Access token refreshed");
+        } catch (error) {
+            console.error("Error during token refresh:", error.response || error.message);
+            alert("Token refresh failed");
+        }
+    };
+
+
+
+    const protectRouter = async () => {
+        try {
+            const response = await axios.get("http://localhost:3001/auth/protected", {
+                headers: { Authorization: `Bearer ${auth?.accessToken}` },
+            });
+            alert(`Protected Route Accessed: ${response.data}`);
+        } catch (error) {
+            alert("Access denied");
+        }
+    }
+
     return (
         <>
             {success ? (
                 <section>
                     <h1>You are logged in!</h1>
                     <br />
-                    <p>
-                        <a href="#">Go to Home</a>
-                    </p>
+                    <button onClick={protectRouter}>Access Protected Route</button>
+                    <button onClick={refreshAccessToken}>Refresh Token</button> {/* Додавання кнопки для оновлення токену */}
                 </section>
             ) : (
                 <section>
@@ -95,12 +122,12 @@ const Login = () => {
                         <button>Sign In</button>
                     </form>
                     <p>
-                        Need an Account?<br />
+                        Need an Account?<br/>
                         <span className="line">
-                            {/*put router link here*/}
-                            <a href="#">Sign Up</a>
+                            <Link to="/register">Sign Up</Link>
                         </span>
                     </p>
+
                 </section>
             )}
         </>

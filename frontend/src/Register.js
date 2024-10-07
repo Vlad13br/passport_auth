@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import { useNavigate, Link } from "react-router-dom"; // Імпорт useNavigate та Link
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
@@ -10,6 +11,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const Register = () => {
     const userRef = useRef();
     const errRef = useRef();
+    const navigate = useNavigate(); // Виклик useNavigate
 
     const [username, setUsername] = useState('');
     const [validName, setValidName] = useState(false);
@@ -73,6 +75,10 @@ const Register = () => {
 
             console.log(response.data);
             setSuccess(true);
+
+            // Перехід на сторінку логіну після успішної реєстрації
+            navigate('/login'); // Додай цей рядок
+
             // Очищення стану після успішної реєстрації
             setUsername('');
             setEmail('');
@@ -96,7 +102,7 @@ const Register = () => {
                 <section>
                     <h1>Success!</h1>
                     <p>
-                        <a href="#">Sign In</a>
+                        <Link to="/login">Sign In</Link> {/* Змінено на Link */}
                     </p>
                 </section>
             ) : (
@@ -178,7 +184,7 @@ const Register = () => {
                     <p>
                         Already registered?<br />
                         <span className="line">
-                            <a href="#">Sign In</a>
+                            <Link to="/login">Sign In</Link> {/* Змінено на Link */}
                         </span>
                     </p>
                 </section>
