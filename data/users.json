@@ -1,38 +1,14 @@
 [
   {
-    "id": "1727187670023",
-    "name": "John Doe",
-    "email": "john@example.com",
-    "password": "$2b$10$5XeYEjB.aqW4y7wiDn.6UuMBqe6BuN5Sv15DZo9GNbgv7nWAEBN8G"
+    "id": "1728133501240",
+    "username": "samio",
+    "email": "alexrozanov11@gmail.com",
+    "password": "$2b$10$B1Pb0JnVmNdrpw4b14/M3ujrggMyOe9R6go3Edre.5odbcvUdXH9m"
   },
   {
-    "id": "1727242675835",
-    "name": "sam",
+    "id": "1728133537434",
+    "username": "liam",
     "email": "sam@gmail.com",
-    "password": "$2b$10$GTatV42OiKqMa/3MITLxx.3X0K9FQvjb82dEMfk5KFLXTt14zqWX6"
-  },
-  {
-    "id": "1727242734575",
-    "name": "alex",
-    "email": "sam@gmail.com",
-    "password": "$2b$10$goP7jLBCr2SzRef/QgleuuJoAWKZx3zqs7iY//fZdKOmheCyUi2KG"
-  },
-  {
-    "id": "1727242783540",
-    "name": "mia",
-    "email": "user@gmail.com",
-    "password": "$2b$10$JOlTNlas/fg2AexnrVPs9.ehjK2pswUdmSn9u7QOTsdJuSrstclc6"
-  },
-  {
-    "id": "1727700875156",
-    "name": "sam",
-    "email": "lox@gmail.com",
-    "password": "$2b$10$BpdC7Cwzmg3eqnEYA0zE0eOd2gvF3HmVViJnOnzj7jB5mz4CNYqLi"
-  },
-  {
-    "id": "1728114712269",
-    "name": "vlad",
-    "email": "vlad@gmail.com",
-    "password": "$2b$10$sBeq1fwpbwsN8.N.NkMIye0d9X9/CLsMPa3Ou8nKf3H65ZFfVbB3e"
+    "password": "$2b$10$Co4DFF85H/NVjM26eBzZ8u5RWG5ID8LaHGDOro0PfFXD7766LeSA2"
   }
 ]

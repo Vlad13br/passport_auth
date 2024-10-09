@@ -4,15 +4,18 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const USERS_FILE = path.join(__dirname, "..", "data", "users.json");
-const refreshTokens = new Set();
+const REFRESH_TOKENS_FILE = path.join(
+  __dirname,
+  "..",
+  "data",
+  "refreshTokens.json"
+);
 
-// Секретні ключі для токенів
 const ACCESS_TOKEN_SECRET =
   process.env.ACCESS_TOKEN_SECRET || "youraccesstokensecret";
 const REFRESH_TOKEN_SECRET =
   process.env.REFRESH_TOKEN_SECRET || "yourrefreshtokensecret";
 
-// Функція для зчитування користувачів з файлу
 function readUsersFromFile() {
   if (!fs.existsSync(USERS_FILE)) {
     fs.writeFileSync(USERS_FILE, JSON.stringify([]));
@@ -21,9 +24,20 @@ function readUsersFromFile() {
   return JSON.parse(data);
 }
 
-// Функція для збереження користувачів
 function saveUsersToFile(users) {
   fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
+
+function readRefreshTokensFromFile() {
+  if (!fs.existsSync(REFRESH_TOKENS_FILE)) {
+    fs.writeFileSync(REFRESH_TOKENS_FILE, JSON.stringify([]));
+  }
+  const data = fs.readFileSync(REFRESH_TOKENS_FILE);
+  return JSON.parse(data);
+}
+
+function saveRefreshTokensToFile(tokens) {
+  fs.writeFileSync(REFRESH_TOKENS_FILE, JSON.stringify(tokens, null, 2));
 }
 
 function generateAccessToken(user) {
@@ -31,13 +45,18 @@ function generateAccessToken(user) {
 }
 
 exports.register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
+
+  // if (!username || !email || !password) {
+  //   console.log(req.body);
+  //   return res.status(400).send("All fields are required");
+  // }
 
   const users = readUsersFromFile();
 
-  // Перевірка, чи вже існує користувач із таким email
   const existingUser = users.find((user) => user.email === email);
   if (existingUser) {
+    console.log(req.body);
     return res.status(400).send("Email is already registered");
   }
 
@@ -45,7 +64,7 @@ exports.register = async (req, res) => {
 
   const user = {
     id: Date.now().toString(),
-    name,
+    username,
     email,
     password: hashedPassword,
   };
@@ -58,6 +77,7 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+  console.log('Login request received:', req.body);
   const { email, password } = req.body;
   const users = readUsersFromFile();
   const user = users.find((user) => user.email === email);
@@ -69,25 +89,50 @@ exports.login = async (req, res) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = jwt.sign({ id: user.id }, REFRESH_TOKEN_SECRET);
 
-  refreshTokens.add(refreshToken);
+  const refreshTokens = readRefreshTokensFromFile();
+  refreshTokens.push(refreshToken);
+  saveRefreshTokensToFile(refreshTokens);
 
-  res.json({ accessToken, refreshToken });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true, // Токен не буде доступний з JavaScript
+    secure: false,   // Тільки для HTTPS (рекомендовано для продакшн)
+    sameSite: 'None', // Відправляти лише з запитами на той самий сайт
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 днів
+  });
+  console.log('Refresh token set in cookies:', refreshToken);
+
+  res.json({ accessToken });
 };
 
 exports.refreshToken = (req, res) => {
-  const { token } = req.body;
-  if (!token) return res.sendStatus(401);
-  if (!refreshTokens.has(token)) return res.sendStatus(403);
+  const token = req.cookies.refreshToken;
+
+  if (!token) {
+    return res.status(401).send("No refresh token found");
+  }
+
+  const refreshTokens = readRefreshTokensFromFile();
+  if (!refreshTokens.includes(token)) {
+    return res.status(403).send("Refresh token not found");
+  }
 
   jwt.verify(token, REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) {
+      return res.status(403).send("Invalid refresh token");
+    }
 
-    refreshTokens.delete(token);
     const newRefreshToken = jwt.sign({ id: user.id }, REFRESH_TOKEN_SECRET);
-    refreshTokens.add(newRefreshToken);
-
     const accessToken = generateAccessToken({ id: user.id });
-    res.json({ accessToken, refreshToken: newRefreshToken });
+
+    // Оновлюємо рефреш токен у cookie
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'None',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 днів
+    });
+
+    res.json({ accessToken });
   });
 };
 
@@ -97,6 +142,8 @@ exports.protectedRoute = (req, res) => {
 
 exports.logout = (req, res) => {
   const { token } = req.body;
-  refreshTokens.delete(token); // Видаляємо токен з `Set`
+  const refreshTokens = readRefreshTokensFromFile();
+  const newRefreshTokens = refreshTokens.filter((t) => t !== token);
+  saveRefreshTokensToFile(newRefreshTokens);
   res.sendStatus(204);
 };
