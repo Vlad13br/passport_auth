@@ -10,5 +10,11 @@
     "username": "liam",
     "email": "sam@gmail.com",
     "password": "$2b$10$Co4DFF85H/NVjM26eBzZ8u5RWG5ID8LaHGDOro0PfFXD7766LeSA2"
+  },
+  {
+    "id": "1728914057567",
+    "username": "user",
+    "email": "user@gmail.com",
+    "password": "$2b$10$YvlfgOA7lgarp7m.Wp4CQOHtvXvoBY.sdqE5PBPTF/BsEnj/GW/SC"
   }
 ]

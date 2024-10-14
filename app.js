@@ -3,7 +3,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const cors = require("cors");
-const helmet = require("helmet");
+// const helmet = require("helmet");
 const morgan = require("morgan");
 const authRouter = require("./routes/authRouter");
 const passportConfig = require("./config/passport");
@@ -25,7 +25,6 @@ app.use((req, res, next) => {
 
 app.use(cookieParser());
 app.use(express.json());
-app.use(helmet());
 app.use(morgan("combined"));
 
 passportConfig(passport);
